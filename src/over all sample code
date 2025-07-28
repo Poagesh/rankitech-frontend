@@ -1,0 +1,158 @@
+import React, { useState } from "react";
+
+// --- Reusable Components ---
+
+const ProgressBar = ({ progress }) => (
+  <div style={{ height: 20, background: "#eee", width: "100%", marginBottom: 16 }}>
+    <div
+      style={{
+        height: "100%",
+        width: `${progress}%`,
+        background: "#4caf50",
+        transition: "width .3s"
+      }}
+    />
+  </div>
+);
+
+const MatchResultTable = ({ matches }) => (
+  <table border="1" cellPadding="8" cellSpacing="0" width="100%">
+    <thead>
+      <tr>
+        <th>Consultant Name</th>
+        <th>Match Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {matches.length ? (
+        matches.map(p => (
+          <tr key={p.id}>
+            <td>{p.name}</td>
+            <td>{(p.score * 100).toFixed(1)}%</td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="2" align="center">No suitable matches found.</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+);
+
+// --- Page Components ---
+
+const ARDashboard = () => {
+  const status = "In Progress";
+  const topMatches = [
+    { id: 1, name: "Alice Singh", score: 0.93 },
+    { id: 2, name: "Bob Das", score: 0.89 },
+    { id: 3, name: "Carol Roy", score: 0.85 }
+  ];
+  return (
+    <div>
+      <h2>JD Comparison Status: {status}</h2>
+      <ProgressBar progress={status === "Completed" ? 100 : 65} />
+      <h3>Top 3 Matches</h3>
+      <MatchResultTable matches={topMatches} />
+      <h4>Email Status: Sent</h4>
+    </div>
+  );
+};
+
+const ARJDStatus = () => (
+  <div>
+    <h2>JD Detailed Status</h2>
+    <p>Progress bar, match results per profile, and candidate details go here.</p>
+    <ProgressBar progress={80} />
+    <MatchResultTable
+      matches={[
+        { id: 1, name: "Alice Singh", score: 0.92 },
+        { id: 2, name: "Bob Das", score: 0.87 },
+        { id: 3, name: "Carol Roy", score: 0.81 }
+      ]}
+    />
+  </div>
+);
+
+const RecruiterConsole = () => (
+  <div>
+    <h2>Recruiter Admin Console</h2>
+    <ul>
+      <li>Monitor agent queues (stub)</li>
+      <li>Error rates, latency, system health</li>
+    </ul>
+  </div>
+);
+
+const RecruiterJDSearch = () => (
+  <div>
+    <h2>JD Search</h2>
+    <p>Filter JDs by skill, experience, status (example only).</p>
+  </div>
+);
+
+const RecruiterReport = () => (
+  <div>
+    <h2>Report Generator</h2>
+    <p>Export match reports by JD or consultant (stub).</p>
+  </div>
+);
+
+const NotFound = () => <h2>Page Not Found</h2>;
+
+// --- Main App ---
+
+export default function App() {
+  const [role, setRole] = useState("ar"); // 'ar' for AR Requestor, 'recruiter' for Recruiter
+  const [page, setPage] = useState("dashboard"); // page navigation
+
+  // Simple navigation and role selector - for demo purposes
+  return (
+    <div style={{ 
+      fontFamily: "sans-serif",
+      maxWidth: 600,
+      margin: "40px auto",
+      border: "1px solid #ddd",
+      padding: 24,
+      borderRadius: 12,
+      background: "#fafbfc"
+    }}>
+      <header style={{ marginBottom: 24 }}>
+        <h1>Recruitment Matcher</h1>
+        <select value={role} onChange={e => { setRole(e.target.value); setPage("dashboard"); }}>
+          <option value="ar">AR Requestor</option>
+          <option value="recruiter">Recruiter</option>
+        </select>
+      </header>
+      <nav style={{ marginBottom: 24 }}>
+        {role === "ar" ? (
+          <>
+            <button onClick={() => setPage("dashboard")}>Dashboard</button>{" "}
+            <button onClick={() => setPage("jdstatus")}>JD Status</button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => setPage("dashboard")}>Admin Console</button>{" "}
+            <button onClick={() => setPage("jdsearch")}>JD Search</button>{" "}
+            <button onClick={() => setPage("report")}>Reports</button>
+          </>
+        )}
+      </nav>
+      <main>
+        {role === "ar" && page === "dashboard" && <ARDashboard />}
+        {role === "ar" && page === "jdstatus" && <ARJDStatus />}
+        {role === "recruiter" && page === "dashboard" && <RecruiterConsole />}
+        {role === "recruiter" && page === "jdsearch" && <RecruiterJDSearch />}
+        {role === "recruiter" && page === "report" && <RecruiterReport />}
+        {!(
+          (role === "ar" && ["dashboard", "jdstatus"].includes(page)) ||
+          (role === "recruiter" && ["dashboard", "jdsearch", "report"].includes(page))
+        ) && <NotFound />}
+      </main>
+      <footer style={{ marginTop: 32, color: "#888", fontSize: 12, textAlign: "center" }}>
+        &copy; {new Date().getFullYear()} Rankitech Recruitment Matcher
+      </footer>
+    </div>
+  );
+}
