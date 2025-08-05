@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 const RecruiterSignupForm = () => {
+  const location = useLocation();
+  const { email, name, password } = location.state || {};
+
   const [formData, setFormData] = useState({
     phone: "",
     designation: "",
@@ -29,16 +34,36 @@ const RecruiterSignupForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length === 0) {
-      alert("Form submitted successfully!");
-      console.log(formData);
-    } else {
-      setErrors(validationErrors);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length === 0) {
+    const fullData = {
+      name,
+      email,
+      password,
+      phone_number: formData.phone,
+      designation: formData.designation,
+      company_name: formData.companyName,
+      company_website: formData.website,
+      industry: formData.industry,
+      company_type: formData.type,
+    };
+
+    try {
+      await axios.post('http://localhost:8000/api/register-recruiter', fullData);
+      alert("Profile submitted successfully!");
+    } catch (err) {
+      alert("Error submitting form: " + (err.response?.data?.detail || err.message));
     }
-  };
+
+    console.log(fullData);
+  } else {
+    setErrors(validationErrors);
+  }
+};
+
+
 
   const gradientStyle = {
     background: "transparent",
@@ -116,7 +141,7 @@ const buttonStyle = {
               className={`form-control ${errors.companyName ? "is-invalid" : ""}`}
               value={formData.companyName}
               onChange={handleChange}
-              placeholder="e.g. Infosys"
+              placeholder="e.g. HexaWare Technologies"
             />
             {errors.companyName && <div className="invalid-feedback">{errors.companyName}</div>}
           </div>

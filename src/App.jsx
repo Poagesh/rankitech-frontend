@@ -5,7 +5,7 @@ import UserDashboard from './pages/UserDashboard';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ARregistration from './pages/ARregistration'; 
-import OtpVerification from './pages/Otpverification';
+import OtpVerification from './pages/OtpVerification';
 import RecruiterSignupForm from './pages/Recruiterregistration';
 
 function App() {
@@ -16,9 +16,9 @@ function App() {
       <Route path="/user" element={<UserDashboard />} />
       <Route path="/recruiter" element={<RecruiterDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/ar-registration" element={<ARregistration />} />
+      <Route path="/ar-details" element={<ARregistration />} />
       <Route path="/otp-verification" element={<OtpVerification />} />
-      <Route path="/recruiter-signup" element={<RecruiterSignupForm />} />
+      <Route path="/recruiter-details" element={<RecruiterSignupForm />} />
       {/* Add other routes as needed */}
     </Routes>
   );
