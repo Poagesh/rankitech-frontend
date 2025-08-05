@@ -41,28 +41,38 @@ const RecruiterSignupForm = () => {
   };
 
   const gradientStyle = {
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
-    color: "white",
+    background: "transparent",
+    color: "#333",
     border: "none",
   };
+  const iconStyle = {
+  color: '#1e88e5',
+};
+const buttonStyle = {
+  backgroundColor: '#1e88e5',
+  color: 'white',
+  border: 'none',
+  padding: '10px 20px',
+  borderRadius: '8px',
+  fontWeight: 'bold',
+  transition: 'background-color 0.3s ease',
+};
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-center justify-content-center"
-      style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
-      }}
+      className="min-vh-100 d-flex align-items-center justify-content-center bg-light"
+      
     >
       <div className="card shadow-lg p-4 bg-white text-dark" style={{ maxWidth: "500px", width: "100%" }}>
         <h4 className="mb-4 text-center fw-bold" style={gradientStyle}>
-          <i className="bi bi-person-badge-fill me-2 p-2 rounded-circle" style={gradientStyle}></i>
+          <i className="bi bi-person-badge-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
           Recruiter Signup
         </h4>
         <form onSubmit={handleSubmit}>
           {/* Phone Number */}
           <div className="mb-3">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-telephone-fill me-2 p-2 rounded-circle" style={gradientStyle}></i>
+              <i className="bi bi-telephone-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Phone Number
             </label>
             <input
@@ -80,7 +90,7 @@ const RecruiterSignupForm = () => {
           {/* Designation */}
           <div className="mb-3">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-person-workspace me-2 p-2 rounded-circle" style={gradientStyle}></i>
+             <i className="bi bi-person-workspace me-2 p-2 rounded-circle" style={iconStyle}></i>
               Designation
             </label>
             <input
@@ -97,7 +107,7 @@ const RecruiterSignupForm = () => {
           {/* Company Name */}
           <div className="mb-3">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-building me-2 p-2 rounded-circle" style={gradientStyle}></i>
+             <i className="bi bi-building me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Name
             </label>
             <input
@@ -114,7 +124,7 @@ const RecruiterSignupForm = () => {
           {/* Website */}
           <div className="mb-3">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-globe2 me-2 p-2 rounded-circle" style={gradientStyle}></i>
+              <i className="bi bi-globe2 me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Website
             </label>
             <input
@@ -131,7 +141,7 @@ const RecruiterSignupForm = () => {
           {/* Industry */}
           <div className="mb-3">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-briefcase-fill me-2 p-2 rounded-circle" style={gradientStyle}></i>
+             <i className="bi bi-briefcase-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Industry
             </label>
             <input
@@ -148,7 +158,7 @@ const RecruiterSignupForm = () => {
           {/* Company Type */}
           <div className="mb-4">
             <label className="form-label d-flex align-items-center">
-              <i className="bi bi-diagram-3-fill me-2 p-2 rounded-circle" style={gradientStyle}></i>
+              <i className="bi bi-diagram-3-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Type
             </label>
             <select
@@ -167,9 +177,9 @@ const RecruiterSignupForm = () => {
             {errors.type && <div className="invalid-feedback">{errors.type}</div>}
           </div>
 
-          <button type="submit" className="btn w-100 fw-bold" style={gradientStyle}>
-            <i className="bi bi-box-arrow-in-right me-2"></i>Submit
-          </button>
+          <button type="submit" className="btn w-100 fw-bold" style={buttonStyle}>
+  <i className="bi bi-box-arrow-in-right me-2" style={iconStyle}></i>Submit
+</button>
         </form>
       </div>
     </div>

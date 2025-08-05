@@ -33,13 +33,13 @@ function Login() {
     avatar: {
       width: '70px',
       height: '70px',
-      background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+      background: 'linear-gradient(135deg, #2196f3, #1e88e5',
       borderRadius: '50%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       margin: '0 auto 20px',
-      color: 'white',
+      color: '#333',
       fontSize: '24px'
     },
     input: {
@@ -51,12 +51,12 @@ function Login() {
       backgroundColor: '#fafafa'
     },
     inputFocus: {
-      borderColor: '#4caf50',
+      borderColor: '#1e88e5',
       backgroundColor: 'white',
       boxShadow: '0 0 0 3px rgba(76, 175, 80, 0.1)'
     },
     button: {
-      background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+      background: 'linear-gradient(135deg, #2196f3, #1e88e5)',
       border: 'none',
       borderRadius: '12px',
       padding: '15px 25px',
@@ -64,20 +64,20 @@ function Login() {
       fontWeight: '600',
       color: 'white',
       transition: 'all 0.3s ease',
-      boxShadow: '0 4px 15px rgba(76, 175, 80, 0.3)'
+      boxShadow: '0 4px 15px rgba(76, 86, 175, 0.3)'
     },
     buttonHover: {
       transform: 'translateY(-2px)',
-      boxShadow: '0 8px 25px rgba(76, 175, 80, 0.4)'
+      boxShadow: '0 8px 25px rgba(83, 76, 175, 0.4)'
     },
     link: {
-      color: '#4caf50',
+      color: '#1e88e5',
       textDecoration: 'none',
       fontWeight: '600',
       transition: 'color 0.3s ease'
     },
     forgotLink: {
-      color: '#4caf50',
+      color: '#1e88e5',
       textDecoration: 'none',
       fontSize: '14px'
     }

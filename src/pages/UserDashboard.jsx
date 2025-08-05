@@ -23,18 +23,20 @@ function UserDashboard() {
   }, []);
 
   const styles = {
+    
+
     container: {
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #f8f9ff 0%, #e8f5e8 50%, #f0f9ff 100%)',
       padding: '20px 0'
     },
     header: {
-      background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+      background: 'linear-gradient(135deg, #2196f3, #1976d2)',
       borderRadius: '20px',
       color: 'white',
       padding: '30px',
       marginBottom: '30px',
-      boxShadow: '0 10px 30px rgba(76, 175, 80, 0.2)'
+      boxShadow: '0 10px 30px rgba(33, 150, 243, 0.3)'
     },
     statsCard: {
       backgroundColor: 'white',
@@ -77,7 +79,7 @@ function UserDashboard() {
       boxShadow: '0 15px 40px rgba(0,0,0,0.12)'
     },
     matchScore: {
-      background: 'linear-gradient(135deg, #4caf50, #66bb6a)',
+      background: 'linear-gradient(135deg, #2196f3, #1976d2)',
       color: 'white',
       padding: '8px 16px',
       borderRadius: '20px',
@@ -110,14 +112,42 @@ function UserDashboard() {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 90) return '#4caf50';
-    if (score >= 80) return '#ff9800';
-    return '#f44336';
+    if (score >= 90) return '#1976d2';
+    if (score >= 80) return '#1976d2';
+    return '#1976d2';
   };
 
   return (
     <div style={styles.container}>
+
       <div className="container">
+        {/* 👤 User Icon Dropdown */}
+      <div className="d-flex justify-content-end mb-3 me-4">
+        <div className="dropdown">
+          <button 
+            className="btn btn-light dropdown-toggle d-flex align-items-center" 
+            type="button" 
+            id="userMenuButton" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false"
+            style={{ 
+              borderRadius: '50%', 
+              padding: '10px 14px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              fontSize: '1.2rem'
+            }}
+          >
+            👤
+          </button>
+          <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+            <li><h6 className="dropdown-header">👋 Hello, John</h6></li>
+            <li><a className="dropdown-item" href="#">📧 john.doe@example.com</a></li>
+            <li><a className="dropdown-item" href="#">⚙️ Profile Settings</a></li>
+            <li><hr className="dropdown-divider" /></li>
+            <li><a className="dropdown-item text-danger" href="#">🚪 Logout</a></li>
+          </ul>
+        </div>
+      </div>
         {/* Header Section */}
         <div style={styles.header} className="text-center">
           <h1 className="mb-3">
