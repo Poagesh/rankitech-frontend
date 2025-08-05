@@ -1,6 +1,18 @@
+// src/pages/OtpVerification.jsx
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const OtpVerification = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { email, role } = location.state || {};
+
+  useEffect(() => {
+    if (!email || !role) {
+      navigate('/register');
+    }
+  }, [email, role, navigate]);
+
   const [otp, setOtp] = useState('');
   const [isValid, setIsValid] = useState(false);
   const [timer, setTimer] = useState(60);
@@ -8,9 +20,7 @@ const OtpVerification = () => {
 
   useEffect(() => {
     if (timer > 0) {
-      const countdown = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
+      const countdown = setInterval(() => setTimer((prev) => prev - 1), 1000);
       return () => clearInterval(countdown);
     } else {
       setCanResend(true);
@@ -26,7 +36,16 @@ const OtpVerification = () => {
   };
 
   const handleVerify = () => {
-    alert(`Verifying OTP: ${otp}`);
+    alert(`Verifying OTP: ${otp} for ${email} as ${role}`);
+
+    // Simulate verification success
+    if (role === 'user') {
+      navigate('/ar-registration', { state: { email } });
+    } else if (role === 'recruiter') {
+      navigate('/recruiter-signup', { state: { email } });
+    } else {
+      navigate('/register');
+    }
   };
 
   const handleResend = () => {

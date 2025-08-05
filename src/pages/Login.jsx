@@ -1,11 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-// Mock Link component for demonstration
-const Link = ({ to, children, className }) => (
-  <a href={to} className={className} onClick={(e) => e.preventDefault()}>
-    {children}
-  </a>
-);
+
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -168,7 +164,7 @@ function Login() {
               to="/register" 
               style={styles.link}
             >
-              Create an account →
+              Create an account
             </Link>
           </p>
         </div>
