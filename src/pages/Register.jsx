@@ -24,20 +24,33 @@ function Register() {
   e.preventDefault();
 
   try {
-    // const response = await axios.post('http://localhost:8000/register', formData); 
-    // console.log('Register Success:', response.data);
+    // You can uncomment the API call when ready
+    // const response = await axios.post('http://localhost:8000/register', formData);
 
-    navigate('/otp-verification', {
-      state: {
-        email: formData.email,
-        role: formData.role,
-      },
-    });
+    // Based on the selected role, navigate to the appropriate detailed registration form
+    if (formData.role === 'user') {
+      navigate('/ar-details', {
+        state: {
+          email: formData.email,
+          name: formData.name,
+          password: formData.password, 
+        },
+      });
+    } else if (formData.role === 'recruiter') {
+      navigate('/recruiter-details', {
+        state: {
+          email: formData.email,
+          name: formData.name,
+          password: formData.password, 
+        },
+      });
+    }
   } catch (error) {
     console.error('Register Error:', error.response?.data || error.message);
     alert('Registration failed: ' + (error.response?.data?.detail || 'Unknown error'));
   }
 };
+
 
   const styles = {
     container: {

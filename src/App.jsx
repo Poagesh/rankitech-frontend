@@ -16,9 +16,9 @@ function App() {
       <Route path="/user" element={<UserDashboard />} />
       <Route path="/recruiter" element={<RecruiterDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/ar-registration" element={<ARregistration />} />
+      <Route path="/ar-details" element={<ARregistration />} />
       <Route path="/otp-verification" element={<OtpVerification />} />
-      <Route path="/recruiter-signup" element={<RecruiterSignupForm />} />
+      <Route path="/recruiter-details" element={<RecruiterSignupForm />} />
       {/* Add other routes as needed */}
     </Routes>
   );
