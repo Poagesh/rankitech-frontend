@@ -1,18 +1,16 @@
-import { useState } from 'react';
-
-// Mock Link component for demonstration
-const Link = ({ to, children, className }) => (
-  <a href={to} className={className} onClick={(e) => e.preventDefault()}>
-    {children}
-  </a>
-);
+// src/pages/Register.jsx
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 function Register() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'user', // user | recruiter
+    role: 'user',
   });
 
   const handleChange = (e) => {
@@ -22,11 +20,24 @@ function Register() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Register:', formData);
-    // TODO: Call API
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // const response = await axios.post('http://localhost:8000/register', formData); 
+    // console.log('Register Success:', response.data);
+
+    navigate('/otp-verification', {
+      state: {
+        email: formData.email,
+        role: formData.role,
+      },
+    });
+  } catch (error) {
+    console.error('Register Error:', error.response?.data || error.message);
+    alert('Registration failed: ' + (error.response?.data?.detail || 'Unknown error'));
+  }
+};
 
   const styles = {
     container: {
@@ -231,7 +242,7 @@ function Register() {
               to="/" 
               style={styles.link}
             >
-              Sign in here →
+              Sign in here
             </Link>
           </p>
         </div>
