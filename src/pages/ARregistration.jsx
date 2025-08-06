@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 const steps = [
   'Basic Info',
@@ -33,25 +36,20 @@ const validationRules = {
     address_line: { required: true, minLength: 10 },
   },
   2: {
+    level: { required: true },
+    institution_name: { required: true },
     degree: { required: true },
     specialization: { required: true },
-    college_name: { required: true },
     register_number: { required: true },
     cgpa: { required: true, min: 0, max: 10 },
-    passout_year_college: { required: true, min: 1990, max: new Date().getFullYear() + 5 },
-    x_school: { required: true },
-    x_board: { required: true },
-    x_year: { required: true, min: 1990, max: new Date().getFullYear() },
-    x_percentage: { required: true, min: 0, max: 100 },
-    xii_school: { required: true },
-    xii_board: { required: true },
-    xii_year: { required: true, min: 1990, max: new Date().getFullYear() },
-    xii_percentage: { required: true, min: 0, max: 100 },
+    board: { required: true },
+    year_of_pass_out: { required: true, min: 1990, max: new Date().getFullYear() + 5 },
+    percentage: { required: true, min: 0, max: 100 },
   },
   3: {
     project_title: { required: true },
     techstack: { required: true },
-    project_description: { required: true, minLength: 20 },
+    description: { required: true, minLength: 20 },
     project_link: { required: false, url: true },
   },
   4: {
@@ -61,17 +59,17 @@ const validationRules = {
   },
   5: {
     job_role: { required: true },
-    company_name: { required: true },
+    organization: { required: true },
     duration: { required: true },
-    experience_description: { required: true, minLength: 20 },
+    description: { required: true, minLength: 20 },
   },
   6: {
-    achievement_title: { required: true },
-    achievement_description: { required: true, minLength: 20 },
+    title: { required: true },
+    description: { required: true, minLength: 20 },
   },
   7: {
-    activity_title: { required: true },
-    activity_description: { required: true, minLength: 20 },
+    title: { required: true },
+    description: { required: true, minLength: 20 },
   },
 };
 
@@ -140,6 +138,7 @@ const ARregistration = () => {
   const [touched, setTouched] = useState({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const validateField = (name, value, rules) => {
     if (!rules) return '';
@@ -295,66 +294,70 @@ const ARregistration = () => {
   };
 
   const handleSubmit = async () => {
-    if (validateStep(step)) {
-      setIsSubmitting(true);
-      setServerError('');
-      try {
-        const formDataPayload = new FormData();
+  if (validateStep(step)) {
+    setIsSubmitting(true);
+    setServerError('');
+    try {
+      const formDataPayload = new FormData();
 
-        // Append basic fields
-        const basicFields = [
-          'name', 'dob', 'gender', 'college', 'institution_roll_no',
-          'primary_email', 'personal_email', 'mobile_no', 'password',
-          'country', 'pincode', 'state', 'district', 'city', 'address_line'
-        ];
-        basicFields.forEach(field => {
-          if (formData[field]) {
-            formDataPayload.append(field, formData[field]);
-          }
-        });
+      // Append basic fields
+      const basicFields = [
+        'name', 'dob', 'gender', 'college', 'institution_roll_no',
+        'primary_email', 'personal_email', 'mobile_no', 'password',
+        'country', 'pincode', 'state', 'district', 'city', 'address_line'
+      ];
+      basicFields.forEach(field => {
+        if (formData[field]) {
+          formDataPayload.append(field, formData[field]);
+        }
+      });
 
-        // Append education details
-        formDataPayload.append('education_details', JSON.stringify(educationDetails));
+      // Append complex fields
+      formDataPayload.append('education_details', JSON.stringify(educationDetails));
+      formDataPayload.append('projects', JSON.stringify(projects));
+      const technicalSkills = formData.technical_skills?.split(',').map(skill => ({ skill: skill.trim() })) || [];
+      const languages = formData.languages?.split(',').map(lang => ({ language: lang.trim() })) || [];
+      const subjects = formData.subjects?.split(',').map(sub => ({ subject: sub.trim() })) || [];
+      formDataPayload.append('technical_skills', JSON.stringify(technicalSkills));
+      formDataPayload.append('languages', JSON.stringify(languages));
+      formDataPayload.append('subjects', JSON.stringify(subjects));
+      formDataPayload.append('experiences', JSON.stringify(experiences));
+      formDataPayload.append('achievements', JSON.stringify(achievements));
+      formDataPayload.append('extra_curricular_activities', JSON.stringify(activities));
 
-        // Append projects
-        formDataPayload.append('projects', JSON.stringify(projects));
+      const response = await axios.post('http://localhost:8000/api/ar-register', formDataPayload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
-        // Append skills (split comma-separated values)
-        const technicalSkills = formData.technical_skills?.split(',').map(skill => ({ skill: skill.trim() })) || [];
-        const languages = formData.languages?.split(',').map(lang => ({ language: lang.trim() })) || [];
-        const subjects = formData.subjects?.split(',').map(sub => ({ subject: sub.trim() })) || [];
-        formDataPayload.append('technical_skills', JSON.stringify(technicalSkills));
-        formDataPayload.append('languages', JSON.stringify(languages));
-        formDataPayload.append('subjects', JSON.stringify(subjects));
+      // Reset form and navigate
+      setFormData({});
+      setEducationDetails([{}]);
+      setProjects([{}]);
+      setExperiences([{}]);
+      setAchievements([{}]);
+      setActivities([{}]);
+      setErrors({});
+      setTouched({});
+      setStep(0);
+      toast.success('Registration completed successfully!', {
+      position: 'top-right',
+      autoClose: 3000,
+      });
 
-        // Append experiences, achievements, and activities
-        formDataPayload.append('experiences', JSON.stringify(experiences));
-        formDataPayload.append('achievements', JSON.stringify(achievements));
-        formDataPayload.append('extra_curricular_activities', JSON.stringify(activities));
+      setTimeout(() => {
+      navigate('/');
+      }, 500); // give time for toast to appear
 
-        const response = await axios.post('http://localhost:8000/api/ar-register', formDataPayload, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
 
-        // Reset form on success
-        setFormData({});
-        setEducationDetails([{}]);
-        setProjects([{}]);
-        setExperiences([{}]);
-        setAchievements([{}]);
-        setActivities([{}]);
-        setErrors({});
-        setTouched({});
-        setStep(0);
-        alert('Registration completed successfully!');
-      } catch (error) {
-        console.error('Submission error:', error);
-        setServerError(error.response?.data?.detail || 'An error occurred during submission');
-      } finally {
-        setIsSubmitting(false);
-      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setServerError(error.response?.data?.detail || 'An error occurred during submission');
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+  }
+};
+
 
   const nextStep = () => {
     if (validateStep(step)) {
@@ -582,6 +585,30 @@ const ARregistration = () => {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <InputField
+                        label="Level (e.g., college, school)"
+                        name="level"
+                        value={edu.level}
+                        onChange={(e) => handleChange(e, i, 'education_details')}
+                        onBlur={() => handleBlur('level', i, 'education_details')}
+                        error={errors[`level_${i}`]}
+                        touched={touched[`level_${i}`]}
+                        section={step}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <InputField
+                        label="Institution Name"
+                        name="institution_name"
+                        value={edu.institution_name}
+                        onChange={(e) => handleChange(e, i, 'education_details')}
+                        onBlur={() => handleBlur('institution_name', i, 'education_details')}
+                        error={errors[`institution_name_${i}`]}
+                        touched={touched[`institution_name_${i}`]}
+                        section={step}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <InputField
                         label="Degree"
                         name="degree"
                         value={edu.degree}
@@ -606,18 +633,6 @@ const ARregistration = () => {
                     </div>
                     <div className="col-md-6">
                       <InputField
-                        label="College Name"
-                        name="college_name"
-                        value={edu.college_name}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('college_name', i, 'education_details')}
-                        error={errors[`college_name_${i}`]}
-                        touched={touched[`college_name_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
                         label="Register Number"
                         name="register_number"
                         value={edu.register_number}
@@ -630,7 +645,7 @@ const ARregistration = () => {
                     </div>
                     <div className="col-md-6">
                       <InputField
-                        label="CGPA/Percentage"
+                        label="CGPA"
                         name="cgpa"
                         type="number"
                         value={edu.cgpa}
@@ -643,114 +658,39 @@ const ARregistration = () => {
                     </div>
                     <div className="col-md-6">
                       <InputField
+                        label="Board"
+                        name="board"
+                        value={edu.board}
+                        onChange={(e) => handleChange(e, i, 'education_details')}
+                        onBlur={() => handleBlur('board', i, 'education_details')}
+                        error={errors[`board_${i}`]}
+                        touched={touched[`board_${i}`]}
+                        section={step}
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <InputField
                         label="Year of Passing"
-                        name="passout_year_college"
+                        name="year_of_pass_out"
                         type="number"
-                        value={edu.passout_year_college}
+                        value={edu.year_of_pass_out}
                         onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('passout_year_college', i, 'education_details')}
-                        error={errors[`passout_year_college_${i}`]}
-                        touched={touched[`passout_year_college_${i}`]}
+                        onBlur={() => handleBlur('year_of_pass_out', i, 'education_details')}
+                        error={errors[`year_of_pass_out_${i}`]}
+                        touched={touched[`year_of_pass_out_${i}`]}
                         section={step}
                       />
                     </div>
                     <div className="col-md-6">
                       <InputField
-                        label="Class X School Name"
-                        name="x_school"
-                        value={edu.x_school}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('x_school', i, 'education_details')}
-                        error={errors[`x_school_${i}`]}
-                        touched={touched[`x_school_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class X Board"
-                        name="x_board"
-                        value={edu.x_board}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('x_board', i, 'education_details')}
-                        error={errors[`x_board_${i}`]}
-                        touched={touched[`x_board_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class X Year"
-                        name="x_year"
+                        label="Percentage"
+                        name="percentage"
                         type="number"
-                        value={edu.x_year}
+                        value={edu.percentage}
                         onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('x_year', i, 'education_details')}
-                        error={errors[`x_year_${i}`]}
-                        touched={touched[`x_year_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class X Percentage"
-                        name="x_percentage"
-                        type="number"
-                        value={edu.x_percentage}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('x_percentage', i, 'education_details')}
-                        error={errors[`x_percentage_${i}`]}
-                        touched={touched[`x_percentage_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class XII School Name"
-                        name="xii_school"
-                        value={edu.xii_school}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('xii_school', i, 'education_details')}
-                        error={errors[`xii_school_${i}`]}
-                        touched={touched[`xii_school_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class XII Board"
-                        name="xii_board"
-                        value={edu.xii_board}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('xii_board', i, 'education_details')}
-                        error={errors[`xii_board_${i}`]}
-                        touched={touched[`xii_board_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class XII Year"
-                        name="xii_year"
-                        type="number"
-                        value={edu.xii_year}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('xii_year', i, 'education_details')}
-                        error={errors[`xii_year_${i}`]}
-                        touched={touched[`xii_year_${i}`]}
-                        section={step}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <InputField
-                        label="Class XII Percentage"
-                        name="xii_percentage"
-                        type="number"
-                        value={edu.xii_percentage}
-                        onChange={(e) => handleChange(e, i, 'education_details')}
-                        onBlur={() => handleBlur('xii_percentage', i, 'education_details')}
-                        error={errors[`xii_percentage_${i}`]}
-                        touched={touched[`xii_percentage_${i}`]}
+                        onBlur={() => handleBlur('percentage', i, 'education_details')}
+                        error={errors[`percentage_${i}`]}
+                        touched={touched[`percentage_${i}`]}
                         section={step}
                       />
                     </div>
@@ -763,7 +703,6 @@ const ARregistration = () => {
               className="btn btn-primary d-flex align-items-center gap-2"
               onClick={() => addFieldSet('education_details')}
             >
-.event
               <span>➕</span> Add Another Education
             </button>
           </div>
@@ -799,13 +738,13 @@ const ARregistration = () => {
                     section={step}
                   />
                   <TextareaField
-                    label="Project Description"
-                    name="project_description"
-                    value={proj.project_description}
+                    label="Description"
+                    name="description"
+                    value={proj.description}
                     onChange={(e) => handleChange(e, i, 'projects')}
-                    onBlur={() => handleBlur('project_description', i, 'projects')}
-                    error={errors[`project_description_${i}`]}
-                    touched={touched[`project_description_${i}`]}
+                    onBlur={() => handleBlur('description', i, 'projects')}
+                    error={errors[`description_${i}`]}
+                    touched={touched[`description_${i}`]}
                     section={step}
                   />
                   <InputField
@@ -898,13 +837,13 @@ const ARregistration = () => {
                     </div>
                     <div className="col-md-6">
                       <InputField
-                        label="Company Name"
-                        name="company_name"
-                        value={exp.company_name}
+                        label="Organization"
+                        name="organization"
+                        value={exp.organization}
                         onChange={(e) => handleChange(e, i, 'experiences')}
-                        onBlur={() => handleBlur('company_name', i, 'experiences')}
-                        error={errors[`company_name_${i}`]}
-                        touched={touched[`company_name_${i}`]}
+                        onBlur={() => handleBlur('organization', i, 'experiences')}
+                        error={errors[`organization_${i}`]}
+                        touched={touched[`organization_${i}`]}
                         section={step}
                       />
                     </div>
@@ -922,13 +861,13 @@ const ARregistration = () => {
                     </div>
                   </div>
                   <TextareaField
-                    label="Job Description"
-                    name="experience_description"
-                    value={exp.experience_description}
+                    label="Description"
+                    name="description"
+                    value={exp.description}
                     onChange={(e) => handleChange(e, i, 'experiences')}
-                    onBlur={() => handleBlur('experience_description', i, 'experiences')}
-                    error={errors[`experience_description_${i}`]}
-                    touched={touched[`experience_description_${i}`]}
+                    onBlur={() => handleBlur('description', i, 'experiences')}
+                    error={errors[`description_${i}`]}
+                    touched={touched[`description_${i}`]}
                     section={step}
                   />
                 </div>
@@ -955,22 +894,22 @@ const ARregistration = () => {
                   <h5 className="card-title text-danger mb-3">🎖️ Achievement #{i + 1}</h5>
                   <InputField
                     label="Achievement Title"
-                    name="achievement_title"
-                    value={ach.achievement_title}
+                    name="title"
+                    value={ach.title}
                     onChange={(e) => handleChange(e, i, 'achievements')}
-                    onBlur={() => handleBlur('achievement_title', i, 'achievements')}
-                    error={errors[`achievement_title_${i}`]}
-                    touched={touched[`achievement_title_${i}`]}
+                    onBlur={() => handleBlur('title', i, 'achievements')}
+                    error={errors[`title_${i}`]}
+                    touched={touched[`title_${i}`]}
                     section={step}
                   />
                   <TextareaField
                     label="Description"
-                    name="achievement_description"
-                    value={ach.achievement_description}
+                    name="description"
+                    value={ach.description}
                     onChange={(e) => handleChange(e, i, 'achievements')}
-                    onBlur={() => handleBlur('achievement_description', i, 'achievements')}
-                    error={errors[`achievement_description_${i}`]}
-                    touched={touched[`achievement_description_${i}`]}
+                    onBlur={() => handleBlur('description', i, 'achievements')}
+                    error={errors[`description_${i}`]}
+                    touched={touched[`description_${i}`]}
                     section={step}
                   />
                 </div>
@@ -997,22 +936,22 @@ const ARregistration = () => {
                   <h5 className="card-title text-success mb-3">🎨 Activity #{i + 1}</h5>
                   <InputField
                     label="Activity Title"
-                    name="activity_title"
-                    value={act.activity_title}
+                    name="title"
+                    value={act.title}
                     onChange={(e) => handleChange(e, i, 'activities')}
-                    onBlur={() => handleBlur('activity_title', i, 'activities')}
-                    error={errors[`activity_title_${i}`]}
-                    touched={touched[`activity_title_${i}`]}
+                    onBlur={() => handleBlur('title', i, 'activities')}
+                    error={errors[`title_${i}`]}
+                    touched={touched[`title_${i}`]}
                     section={step}
                   />
                   <TextareaField
                     label="Description"
-                    name="activity_description"
-                    value={act.activity_description}
+                    name="description"
+                    value={act.description}
                     onChange={(e) => handleChange(e, i, 'activities')}
-                    onBlur={() => handleBlur('activity_description', i, 'activities')}
-                    error={errors[`activity_description_${i}`]}
-                    touched={touched[`activity_description_${i}`]}
+                    onBlur={() => handleBlur('description', i, 'activities')}
+                    error={errors[`description_${i}`]}
+                    touched={touched[`description_${i}`]}
                     section={step}
                   />
                 </div>
