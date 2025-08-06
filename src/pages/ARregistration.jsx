@@ -10,7 +10,6 @@ const steps = [
   'Experiences',
   'Achievements',
   'Extra Curricular Activities',
-  'Resume',
 ];
 
 const validationRules = {
@@ -74,9 +73,6 @@ const validationRules = {
     activity_title: { required: true },
     activity_description: { required: true, minLength: 20 },
   },
-  8: {
-    resume: { required: true, fileType: ['.pdf', '.doc', '.docx'], maxSize: 5 * 1024 * 1024 },
-  },
 };
 
 const stepIcons = {
@@ -88,7 +84,6 @@ const stepIcons = {
   5: '💪',
   6: '🏆',
   7: '🎭',
-  8: '📄',
 };
 
 const InputField = ({ label, name, type = 'text', value, onChange, onBlur, error, touched, section }) => {
@@ -159,11 +154,6 @@ const ARregistration = () => {
       if (rules.min && parseFloat(value) < rules.min) return `Must be at least ${rules.min}`;
       if (rules.max && parseFloat(value) > rules.max) return `Must be at most ${rules.max}`;
       if (rules.url && !/^https?:\/\/.+/.test(value)) return 'Invalid URL';
-      if (rules.fileType && value instanceof File) {
-        const extension = '.' + value.name.split('.').pop().toLowerCase();
-        if (!rules.fileType.includes(extension)) return `Supported formats: ${rules.fileType.join(', ')}`;
-        if (rules.maxSize && value.size > rules.maxSize) return `File size must be less than ${rules.maxSize / (1024 * 1024)}MB`;
-      }
     }
     return '';
   };
@@ -246,8 +236,8 @@ const ARregistration = () => {
   };
 
   const handleChange = (e, index, section) => {
-    const { name, value, files } = e.target;
-    const fieldValue = files ? files[0] : value;
+    const { name, value } = e.target;
+    const fieldValue = value;
 
     if (section === 'education_details') {
       const updated = [...educationDetails];
@@ -322,11 +312,6 @@ const ARregistration = () => {
             formDataPayload.append(field, formData[field]);
           }
         });
-
-        // Append resume file
-        if (formData.resume) {
-          formDataPayload.append('resume', formData.resume);
-        }
 
         // Append education details
         formDataPayload.append('education_details', JSON.stringify(educationDetails));
@@ -778,6 +763,7 @@ const ARregistration = () => {
               className="btn btn-primary d-flex align-items-center gap-2"
               onClick={() => addFieldSet('education_details')}
             >
+.event
               <span>➕</span> Add Another Education
             </button>
           </div>
@@ -1039,36 +1025,6 @@ const ARregistration = () => {
             >
               <span>🎭</span> Add Another Activity
             </button>
-          </div>
-        );
-      case 8:
-        return (
-          <div>
-            <h2 className="h4 mb-4 fw-bold">
-              <span className="fs-3 me-2">{stepIcons[8]}</span> Resume Upload
-            </h2>
-            <div className="card mb-3">
-              <div className="card-body">
-                <div className="mb-3">
-                  <label htmlFor="resume" className="form-label fw-semibold">
-                    Upload Resume <span className="text-danger ms-1">*</span>
-                  </label>
-                  <input
-                    id="resume"
-                    type="file"
-                    className={`form-control ${errors.resume && touched.resume ? 'is-invalid' : ''}`}
-                    name="resume"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleChange}
-                    onBlur={() => handleBlur('resume')}
-                  />
-                  <div className="form-text fst-italic">
-                    📎 Supported formats: PDF, DOC, DOCX (Max size: 5MB)
-                  </div>
-                  {errors.resume && touched.resume && <div className="invalid-feedback">{errors.resume}</div>}
-                </div>
-              </div>
-            </div>
           </div>
         );
       default:
