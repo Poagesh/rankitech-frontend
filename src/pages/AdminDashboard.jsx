@@ -65,11 +65,11 @@ function AdminDashboard() {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8f9ff 0%, #e8f5e8 50%, #f0f9ff 100%)',
+      background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       padding: '20px 0'
     },
     header: {
-      background: 'linear-gradient(135deg, #9c27b0, #673ab7)',
+      background: 'linear-gradient(135deg, #2196f3, #1e88e5',
       borderRadius: '20px',
       color: 'white',
       padding: '30px',
@@ -108,7 +108,7 @@ function AdminDashboard() {
       backgroundColor: '#fafafa'
     },
     searchInputFocus: {
-      borderColor: '#9c27b0',
+      borderColor: '#1e88e5',
       backgroundColor: 'white',
       boxShadow: '0 0 0 3px rgba(156, 39, 176, 0.1)'
     },
@@ -122,7 +122,7 @@ function AdminDashboard() {
       cursor: 'pointer'
     },
     selectFocus: {
-      borderColor: '#9c27b0',
+      borderColor: '#1e88e5',
       backgroundColor: 'white',
       boxShadow: '0 0 0 3px rgba(156, 39, 176, 0.1)'
     },
@@ -172,7 +172,7 @@ function AdminDashboard() {
   const getRoleBadgeStyle = (role) => {
     return role === 'recruiter' 
       ? { ...styles.roleBadge, backgroundColor: '#e3f2fd', color: '#1976d2' }
-      : { ...styles.roleBadge, backgroundColor: '#f3e5f5', color: '#7b1fa2' };
+      : { ...styles.roleBadge, backgroundColor: '#f3e5f5', color: '#1976d2' };
   };
 
   const getStatusBadgeStyle = (status) => {
@@ -295,13 +295,13 @@ function AdminDashboard() {
             <table className="table table-hover">
               <thead>
                 <tr style={{backgroundColor: '#f8f9fa'}}>
-                  <th className="fw-bold text-dark">#</th>
-                  <th className="fw-bold text-dark">👤 User</th>
-                  <th className="fw-bold text-dark">📧 Email</th>
-                  <th className="fw-bold text-dark">🎭 Role</th>
-                  <th className="fw-bold text-dark">📊 Status</th>
-                  <th className="fw-bold text-dark">📅 Joined</th>
-                  <th className="fw-bold text-dark">⚙️ Actions</th>
+                  <th className="fw-bold text-dark">count</th>
+                  <th className="fw-bold text-dark"> User</th>
+                  <th className="fw-bold text-dark"> Email</th>
+                  <th className="fw-bold text-dark"> Role</th>
+                  <th className="fw-bold text-dark"> Status</th>
+                  <th className="fw-bold text-dark"> Joined</th>
+                  <th className="fw-bold text-dark"> Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -356,7 +356,7 @@ function AdminDashboard() {
                         onMouseOver={(e) => e.target.style.opacity = '0.8'}
                         onMouseOut={(e) => e.target.style.opacity = '1'}
                       >
-                        {user.status === 'active' ? '⏸️ Suspend' : '▶️ Activate'}
+                        {user.status === 'active' ? 'Suspend' : 'Activate'}
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
@@ -368,7 +368,7 @@ function AdminDashboard() {
                         onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
                         onMouseOut={(e) => e.target.style.backgroundColor = '#f44336'}
                       >
-                        🗑️ Delete
+                       Delete
                       </button>
                     </td>
                   </tr>

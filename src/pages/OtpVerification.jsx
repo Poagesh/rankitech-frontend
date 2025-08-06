@@ -56,7 +56,7 @@ const OtpVerification = () => {
     alert('OTP has been resent!');
   };
 
-  const gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
+  const gradient = 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)';
 
   const styles = {
     container: {

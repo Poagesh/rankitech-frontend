@@ -911,7 +911,7 @@ const ARregistration = () => {
   };
 
   return (
-    <div className="min-vh-100 py-5" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}>
+    <div className="min-vh-100 py-5" style={{ background: 'linear-gradient( 135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)' }}>
       <div className="container">
         <div className="card shadow-lg mx-auto" style={{ maxWidth: '800px' }}>
           <div className="card-body p-5">

@@ -148,7 +148,7 @@ function Register() {
         <div>
           <div className="mb-4">
             <label className="form-label fw-semibold text-dark">
-              👤 Full Name
+               Full Name
             </label>
             <input
               name="name"
@@ -166,7 +166,7 @@ function Register() {
 
           <div className="mb-4">
             <label className="form-label fw-semibold text-dark">
-              📧 Email Address
+               Email Address
             </label>
             <input
               name="email"
@@ -184,7 +184,7 @@ function Register() {
 
           <div className="mb-4">
             <label className="form-label fw-semibold text-dark">
-              🔒 Password
+               Password
             </label>
             <input
               name="password"
@@ -202,7 +202,7 @@ function Register() {
 
           <div className="mb-4">
             <label className="form-label fw-semibold text-dark">
-              🎭 Account Type
+               Account Type
             </label>
             <select
               name="role"
@@ -214,10 +214,10 @@ function Register() {
               onBlur={(e) => Object.assign(e.target.style, styles.select)}
             >
               <option value="user">
-                🙋‍♂️ Job Seeker - Looking for opportunities
+                 Job Seeker - Looking for opportunities
               </option>
               <option value="recruiter">
-                🏢 Recruiter - Hiring talented professionals
+                 Recruiter - Hiring talented professionals
               </option>
             </select>
           </div>
@@ -244,7 +244,7 @@ function Register() {
             onMouseEnter={(e) => Object.assign(e.target.style, {...styles.button, ...styles.buttonHover})}
             onMouseLeave={(e) => Object.assign(e.target.style, styles.button)}
           >
-            🎉 Create Account
+             Create Account
           </button>
         </div>
 

@@ -27,7 +27,7 @@ function UserDashboard() {
 
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8f9ff 0%, #e8f5e8 50%, #f0f9ff 100%)',
+      background: 'linear-gradient( 135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       padding: '20px 0'
     },
     header: {

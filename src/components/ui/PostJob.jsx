@@ -19,7 +19,7 @@ const PostJob = ({ onBack, onPostJob }) => {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       padding: '20px'
     },
     backButton: {
@@ -85,7 +85,7 @@ const PostJob = ({ onBack, onPostJob }) => {
       resize: 'vertical'
     },
     button: {
-      background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+      background: 'linear-gradient(135deg, #2196f3, #1e88e5',
       border: 'none',
       borderRadius: '12px',
       padding: '15px 30px',

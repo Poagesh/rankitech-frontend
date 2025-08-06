@@ -5,7 +5,7 @@ const TopMatches = ({ job, topMatches, onBack }) => {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       padding: '20px'
     },
     backButton: {
@@ -75,7 +75,7 @@ const TopMatches = ({ job, topMatches, onBack }) => {
     avatar: {
       width: '60px',
       height: '60px',
-      background: 'linear-gradient(135deg, #4caf50, #2e7d32)',
+      background: 'linear-gradient(135deg, #2196f3, #1e88e5)',
       borderRadius: '50%',
       display: 'flex',
       alignItems: 'center',
@@ -98,7 +98,7 @@ const TopMatches = ({ job, topMatches, onBack }) => {
     matchScore: {
       fontSize: '32px',
       fontWeight: '700',
-      color: '#4caf50',
+      color: ' #2196f3',
       display: 'flex',
       alignItems: 'center',
       gap: '5px'

@@ -5,7 +5,7 @@ const RecruiterProfile = ({ recruiter, onBack }) => {
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       padding: '20px'
     },
     backButton: {
@@ -68,7 +68,7 @@ const RecruiterProfile = ({ recruiter, onBack }) => {
       alignItems: 'center',
       gap: '12px',
       padding: '15px',
-      background: '#f8f9fa',
+      background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
       borderRadius: '12px',
       border: '1px solid #e9ecef'
     },

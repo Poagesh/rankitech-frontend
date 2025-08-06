@@ -5,7 +5,7 @@ import UserDashboard from './pages/UserDashboard';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ARregistration from './pages/ARregistration'; 
-import OtpVerification from './pages/OtpVerification';
+import OtpVerification from './pages/Otpverification';
 import RecruiterSignupForm from './pages/Recruiterregistration';
 
 function App() {

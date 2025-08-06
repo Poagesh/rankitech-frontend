@@ -85,9 +85,16 @@ const buttonStyle = {
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-center justify-content-center bg-light"
-      
-    >
+  style={{
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #e8f5e8 0%, #e0f2f1 50%, #e1f5fe 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+  }}
+  
+>
       <div className="card shadow-lg p-4 bg-white text-dark" style={{ maxWidth: "500px", width: "100%" }}>
         <h4 className="mb-4 text-center fw-bold" style={gradientStyle}>
           <i className="bi bi-person-badge-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
@@ -95,8 +102,8 @@ const buttonStyle = {
         </h4>
         <form onSubmit={handleSubmit}>
           {/* Phone Number */}
-          <div className="mb-3">
-            <label className="form-label d-flex align-items-center">
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-dark">
               <i className="bi bi-telephone-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Phone Number
             </label>
@@ -113,8 +120,8 @@ const buttonStyle = {
           </div>
 
           {/* Designation */}
-          <div className="mb-3">
-            <label className="form-label d-flex align-items-center">
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-dark">
              <i className="bi bi-person-workspace me-2 p-2 rounded-circle" style={iconStyle}></i>
               Designation
             </label>
@@ -130,8 +137,8 @@ const buttonStyle = {
           </div>
 
           {/* Company Name */}
-          <div className="mb-3">
-            <label className="form-label d-flex align-items-center">
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-dark">
              <i className="bi bi-building me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Name
             </label>
@@ -147,8 +154,8 @@ const buttonStyle = {
           </div>
 
           {/* Website */}
-          <div className="mb-3">
-            <label className="form-label d-flex align-items-center">
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-dark">
               <i className="bi bi-globe2 me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Website
             </label>
@@ -164,8 +171,8 @@ const buttonStyle = {
           </div>
 
           {/* Industry */}
-          <div className="mb-3">
-            <label className="form-label d-flex align-items-center">
+          <div className="mb-4">
+            <label className="form-label fw-semibold text-dark">
              <i className="bi bi-briefcase-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Industry
             </label>
@@ -182,7 +189,7 @@ const buttonStyle = {
 
           {/* Company Type */}
           <div className="mb-4">
-            <label className="form-label d-flex align-items-center">
+            <label className="form-label fw-semibold text-dark">
               <i className="bi bi-diagram-3-fill me-2 p-2 rounded-circle" style={iconStyle}></i>
               Company Type
             </label>
