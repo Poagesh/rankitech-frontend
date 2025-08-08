@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminHeader from '../components/ui/Adminheader';
 import Header from '../components/ui/Header';
 import StatsCard from '../components/ui/Statscards';
 import Filters from '../components/ui/Filters';
 import UsersTable from '../components/ui/Userstable';
 import '../styles/styles.css';
+import axios from 'axios';
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -12,6 +14,12 @@ function AdminDashboard() {
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [userName, setUserName] = useState('');
+
+  const token = localStorage.getItem('access_token');
+  const role = localStorage.getItem('role');
+  const user_id = localStorage.getItem('user_id');
+  const navigate = useNavigate();
 
   // Mock data
   useEffect(() => {
@@ -25,6 +33,32 @@ function AdminDashboard() {
     setUsers(mockUsers);
     setFilteredUsers(mockUsers);
   }, []);
+
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-User-Id': user_id,
+            'X-User-Role': role,
+          },
+        });
+        setUserName(res.data.name);
+      } catch (err) {
+        console.error(err);
+        navigate('/'); 
+      }
+    };
+
+    fetchUserName();
+  }, [token, navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
 
   // Filter users
   useEffect(() => {
@@ -67,9 +101,9 @@ function AdminDashboard() {
 
   return (
       <div className="dashboard">
-        <Header />
+        <Header Name={userName} onProfileClick={() => {}} onLogout={handleLogout} />
     <div className="container">
-        <AdminHeader />
+        <AdminHeader Name={userName} />
         <div className="stats-row">
           
             <StatsCard icon="👥" value={totalUsers} label="Total Users" colorClass="color-blue" />

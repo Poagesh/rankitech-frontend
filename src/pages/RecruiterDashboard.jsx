@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/ui/Header';
 import RecruiterProfile from '../components/ui/RecruiterProfile';
 import Dashboard from '../components/ui/Dashboard';
@@ -11,6 +14,12 @@ import TopMatches from '../components/ui/TopMatches';
 const RecruiterDashboard = () => {
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedJob, setSelectedJob] = useState(null);
+  const [userName, setUserName] = useState('');
+
+  const token = localStorage.getItem('access_token');
+  const role = localStorage.getItem('role');
+  const user_id = localStorage.getItem('user_id');
+  const navigate = useNavigate();
   
   // Mock data
   const [recruiter] = useState({
@@ -22,6 +31,32 @@ const RecruiterDashboard = () => {
     joinDate: 'January 2022',
     department: 'Human Resources'
   });
+
+  useEffect(() => {
+      const fetchUserName = async () => {
+        try {
+          const res = await axios.get('http://localhost:8000/api/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'X-User-Id': user_id,
+              'X-User-Role': role,
+            },
+          });
+          console.log(res.data);
+          setUserName(res.data.name);
+        } catch (err) {
+          console.error(err);
+          navigate('/'); 
+        }
+      };
+  
+      fetchUserName();
+    }, [token, navigate]);
+  
+    const handleLogout = () => {
+      localStorage.clear();
+      navigate('/');
+    };
 
   const [jobs, setJobs] = useState([
     {
@@ -124,9 +159,6 @@ const RecruiterDashboard = () => {
     alert('Job updated successfully!');
   };
 
-  const handleLogout = () => {
-    alert('Logging out...');
-  };
 
   const renderCurrentView = () => {
     switch (currentView) {
@@ -208,11 +240,7 @@ const RecruiterDashboard = () => {
 
   return (
     <div>
-      <Header
-        recruiterName={recruiter.name}
-        onProfileClick={() => setCurrentView('profile')}
-        onLogout={handleLogout}
-      />
+      <Header Name={userName} onProfileClick={() => {}} onLogout={handleLogout} />
       {renderCurrentView()}
     </div>
   );
