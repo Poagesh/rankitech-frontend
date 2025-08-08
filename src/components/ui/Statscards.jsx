@@ -1,3 +1,4 @@
+// rankitech-frontend/src/components/ui/Statscards.jsx
 import { styles } from '../../styles/styles';
 
 function StatsCard({ icon, value, label, color }) {

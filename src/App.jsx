@@ -34,25 +34,25 @@ function App() {
         <Route
           path="/user"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <UserDashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/recruiter"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <RecruiterDashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <AdminDashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
       </Routes>
