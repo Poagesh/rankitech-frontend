@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { styles } from '../styles/styles';
 import Header from '../components/ui/Header';
 import UserHeader from '../components/ui/Userheader';
@@ -11,6 +12,13 @@ function UserDashboard() {
   const [matchedJobs, setMatchedJobs] = useState([]);
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
+  const [userName, setUserName] = useState('');
+
+  const token = localStorage.getItem('access_token');
+  const role = localStorage.getItem('role');
+  const user_id = localStorage.getItem('user_id');
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     setMatchedJobs([
@@ -18,6 +26,31 @@ function UserDashboard() {
       { id: 2, jobTitle: 'Frontend Engineer', company: 'InnovateX', matchScore: 85 },
     ]);
   }, []);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-User-Id': user_id,
+            'X-User-Role': role,
+          },
+        });
+        setUserName(res.data.name);
+      } catch (err) {
+        console.error(err);
+        navigate('/'); 
+      }
+    };
+
+    fetchUserName();
+  }, [token, navigate]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
 
   const handleResumeUpload = async (event) => {
     const file = event.target.files[0];
@@ -56,11 +89,11 @@ function UserDashboard() {
 
   return (
     <div style={styles.container}>
-        <Header />
+        <Header Name={userName} onProfileClick={() => {}} onLogout={handleLogout} />
         <div></div>
       <div className="container">
         
-        <UserHeader />
+        <UserHeader Name={userName} />
         <div className="row mb-4">
           <StatsCard icon="🎯" value={matchedJobs.length} label="Job Matches" color="primary" />
           <StatsCard

@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, LogOut, Briefcase } from 'lucide-react';
 
-const Header = ({ recruiterName, onProfileClick, onLogout }) => {
+const Header = ({ Name, onProfileClick, onLogout }) => {
   const styles = {
     header: {
       background: 'linear-gradient(135deg, #2196f3, #1976d2)',
@@ -74,7 +74,7 @@ const Header = ({ recruiterName, onProfileClick, onLogout }) => {
           }}
         >
           <User size={18} />
-          <span>{recruiterName}</span>
+          <span>{Name}</span>
         </button>
         
         <button 
