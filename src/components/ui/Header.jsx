@@ -10,7 +10,8 @@ const Header = ({ recruiterName, onProfileClick, onLogout }) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       boxShadow: '0 4px 15px rgba(33, 150, 243, 0.2)',
-      color: 'white'
+      color: 'white',
+      margin: '20px'
     },
     logo: {
       display: 'flex',
@@ -56,7 +57,7 @@ const Header = ({ recruiterName, onProfileClick, onLogout }) => {
     <header style={styles.header}>
       <div style={styles.logo}>
         <Briefcase size={28} />
-        <span>RecruiterHub</span>
+        <span>Rankitech</span>
       </div>
       
       <div style={styles.profileSection}>
