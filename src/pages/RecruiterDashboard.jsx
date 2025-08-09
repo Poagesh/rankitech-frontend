@@ -181,7 +181,6 @@ const RecruiterDashboard = () => {
         return (
           <PostJob
             onBack={() => setCurrentView('dashboard')}
-            onPostJob={handlePostJob}
           />
         );
       case 'jobsList':

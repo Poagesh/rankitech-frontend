@@ -53,39 +53,40 @@ function UserDashboard() {
   };
 
   const handleResumeUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const file = event.target.files[0];
+  if (!file) return;
 
-    const allowedTypes = ['.pdf', '.doc', '.docx'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+  const allowedTypes = ['.pdf', '.doc', '.docx'];
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
 
-    if (!allowedTypes.includes(fileExtension)) {
-      setUploadError('Invalid file format. Please upload a PDF, DOC, or DOCX file.');
-      setUploadSuccess('');
-      return;
-    }
+  if (!allowedTypes.includes(fileExtension)) {
+    setUploadError('Invalid file format. Please upload a PDF, DOC, or DOCX file.');
+    setUploadSuccess('');
+    return;
+  }
 
-    if (file.size > maxSize) {
-      setUploadError('File size exceeds 5MB limit.');
-      setUploadSuccess('');
-      return;
-    }
+  if (file.size > maxSize) {
+    setUploadError('File size exceeds 5MB limit.');
+    setUploadSuccess('');
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append('resume', file);
+  const formData = new FormData();
+  formData.append('consultant_id', user_id); 
+  formData.append('file', file); 
 
-    try {
-      const response = await axios.post('http://localhost:8000/api/upload-resume', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setUploadSuccess('Resume uploaded successfully!');
-      setUploadError('');
-    } catch (error) {
-      setUploadError(error.response?.data?.detail || 'Failed to upload resume. Please try again.');
-      setUploadSuccess('');
-    }
-  };
+  try {
+    const response = await axios.post('http://localhost:8000/api/upload-resume', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    setUploadSuccess('Resume uploaded successfully!');
+    setUploadError('');
+  } catch (error) {
+    setUploadError(error.response?.data?.detail || 'Failed to upload resume. Please try again.');
+    setUploadSuccess('');
+  }
+};
 
   return (
     <div style={styles.container}>
