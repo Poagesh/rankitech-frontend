@@ -1,92 +1,90 @@
 import React from 'react';
-import '../../styles/styles.css';
 
 function UsersTable({ filteredUsers, handleStatusToggle, handleDelete }) {
-  const getRoleBadgeStyle = (role) =>
-    role === 'recruiter'
-      ? 'role-badge role-badge-recruiter'
-      : 'role-badge role-badge-user';
+  const getStatusBadge = (status) => {
+    return status === 'active' 
+      ? <span className="badge bg-success">Active</span>
+      : <span className="badge bg-secondary">Inactive</span>;
+  };
 
-  const getStatusBadgeStyle = (status) =>
-    status === 'active'
-      ? 'status-badge status-badge-active'
-      : 'status-badge status-badge-inactive';
+  const getRoleBadge = (role) => {
+    return role === 'recruiter' 
+      ? <span className="badge bg-primary">Recruiter</span>
+      : <span className="badge bg-info">Job Seeker</span>;
+  };
 
   return (
-    <div className="table-card">
-      <div className="section-header">
-        <span className="section-icon">👤</span>
-        <h5 className="section-title">
-          User Management ({filteredUsers.length} users)
-        </h5>
+    <div className="users-table-container">
+      <div className="table-header">
+        <h5 className="mb-0">Users Management</h5>
+        <span className="text-muted">({filteredUsers.length} users)</span>
       </div>
+      
       <div className="table-responsive">
-        <table className="user-table">
-          <thead>
-            <tr className="table-header">
-              <th>count</th>
-              <th>User</th>
+        <table className="table table-hover">
+          <thead className="table-light">
+            <tr>
+              <th>Name</th>
               <th>Email</th>
               <th>Role</th>
               <th>Status</th>
-              <th>Joined</th>
+              <th>Join Date</th>
+              <th>Additional Info</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user, index) => (
-              <tr key={user.id} className="user-row">
-                <td className="fw-semibold">{index + 1}</td>
+            {filteredUsers.map(user => (
+              <tr key={user.id}>
                 <td>
                   <div className="user-info">
-                    <div className="user-avatar">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
                     <strong>{user.name}</strong>
                   </div>
                 </td>
-                <td className="text-muted">{user.email}</td>
+                <td>{user.email}</td>
+                <td>{getRoleBadge(user.role)}</td>
+                <td>{getStatusBadge(user.status)}</td>
+                <td>{user.joinDate}</td>
                 <td>
-                  <span className={getRoleBadgeStyle(user.role)}>
-                    {user.role === 'recruiter' ? '🏢 Recruiter' : '🎯 Job Seeker'}
-                  </span>
+                  <small className="text-muted">
+                    {user.role === 'recruiter' 
+                      ? `Company: ${user.company || 'N/A'}`
+                      : `College: ${user.college || 'N/A'}`
+                    }
+                  </small>
                 </td>
                 <td>
-                  <span className={getStatusBadgeStyle(user.status)}>
-                    {user.status === 'active' ? '✅ Active' : '⏸️ Inactive'}
-                  </span>
-                </td>
-                <td className="text-muted">{user.joinDate}</td>
-                <td>
-                  <button
-                    onClick={() => handleStatusToggle(user.id)}
-                    className={`action-button ${
-                      user.status === 'active' ? 'button-suspend' : 'button-activate'
-                    }`}
-                  >
-                    {user.status === 'active' ? 'Suspend' : 'Activate'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.id)}
-                    className="action-button button-delete"
-                  >
-                    Delete
-                  </button>
+                  <div className="btn-group btn-group-sm">
+                    <button 
+                      className={`btn ${user.status === 'active' ? 'btn-warning' : 'btn-success'}`}
+                      onClick={() => handleStatusToggle(user.id)}
+                      title={user.status === 'active' ? 'Deactivate' : 'Activate'}
+                    >
+                      {user.status === 'active' ? '⏸️' : '▶️'}
+                    </button>
+                    <button 
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(user.id)}
+                      title="Delete User"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        
+        {filteredUsers.length === 0 && (
+          <div className="text-center py-4">
+            <div className="text-muted">
+              <i className="fas fa-users fa-2x mb-3"></i>
+              <p>No users found matching your criteria.</p>
+            </div>
+          </div>
+        )}
       </div>
-      {filteredUsers.length === 0 && (
-        <div className="no-results">
-          <div className="no-results-icon">🔍</div>
-          <h5 className="no-results-title">No users found</h5>
-          <p className="no-results-text">
-            Try adjusting your search or filter criteria
-          </p>
-        </div>
-      )}
     </div>
   );
 }

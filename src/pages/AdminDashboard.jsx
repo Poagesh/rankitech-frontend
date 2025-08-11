@@ -15,26 +15,19 @@ function AdminDashboard() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    totalApplications: 0,
+    emailsSent: 0
+  });
 
   const token = localStorage.getItem('access_token');
   const role = localStorage.getItem('role');
   const user_id = localStorage.getItem('user_id');
   const navigate = useNavigate();
 
-  // Mock data
-  useEffect(() => {
-    const mockUsers = [
-      { id: 1, name: 'Monish Soorya', email: 'monish@example.com', role: 'user', status: 'active', joinDate: '2024-01-15' },
-      { id: 2, name: 'Priya Ramesh', email: 'priya@hire.com', role: 'recruiter', status: 'active', joinDate: '2024-02-20' },
-      { id: 3, name: 'Arjun V', email: 'arjun@xyz.com', role: 'user', status: 'inactive', joinDate: '2024-01-10' },
-      { id: 4, name: 'Sarah Johnson', email: 'sarah@tech.com', role: 'recruiter', status: 'active', joinDate: '2024-03-05' },
-      { id: 5, name: 'Raj Kumar', email: 'raj@dev.com', role: 'user', status: 'active', joinDate: '2024-02-28' },
-    ];
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
-  }, []);
-
-
+  // Fetch admin profile
   useEffect(() => {
     const fetchUserName = async () => {
       try {
@@ -48,12 +41,93 @@ function AdminDashboard() {
         setUserName(res.data.name);
       } catch (err) {
         console.error(err);
-        navigate('/'); 
+        navigate('/');
+      }
+    };
+    fetchUserName();
+  }, [token, navigate, user_id, role]);
+
+  // Fetch all users (consultants + recruiters)
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch consultants (job seekers)
+        const consultantsResponse = await axios.get('http://localhost:8000/api/consultant_profiles', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Fetch recruiters
+        const recruitersResponse = await axios.get('http://localhost:8000/api/recruiters', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Fetch jobs for stats
+        const jobsResponse = await axios.get('http://localhost:8000/api/jobs/', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Fetch job applications for stats
+        const applicationsResponse = await axios.get('http://localhost:8000/api/job_applications', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Format consultants data
+        const consultants = consultantsResponse.data.map(consultant => ({
+          id: `consultant_${consultant.id}`,
+          originalId: consultant.id,
+          name: consultant.name,
+          email: consultant.primary_email,
+          role: 'user',
+          status: 'active', // You can add status field to backend if needed
+          joinDate: consultant.created_at ? consultant.created_at.split('T')[0] : 'N/A',
+          type: 'consultant',
+          college: consultant.college,
+          city: consultant.city,
+          mobile: consultant.mobile_no
+        }));
+
+        // Format recruiters data
+        const recruiters = recruitersResponse.data.map(recruiter => ({
+          id: `recruiter_${recruiter.id}`,
+          originalId: recruiter.id,
+          name: recruiter.name,
+          email: recruiter.email,
+          role: 'recruiter',
+          status: 'active',
+          joinDate: recruiter.created_at ? recruiter.created_at.split('T')[0] : 'N/A',
+          type: 'recruiter',
+          company: recruiter.company_name,
+          phone: recruiter.phone_number
+        }));
+
+        // Combine all users
+        const allUsers = [...consultants, ...recruiters];
+        setUsers(allUsers);
+        setFilteredUsers(allUsers);
+
+        // Set stats
+        setStats({
+          totalJobs: jobsResponse.data.length,
+          totalApplications: applicationsResponse.data.length,
+          emailsSent: Math.floor(Math.random() * 50 + 10) // Mock data, replace with real endpoint
+        });
+
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        alert('Failed to load user data. Please try refreshing the page.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserName();
-  }, [token, navigate]);
+    if (token && role === 'admin') {
+      fetchAllUsers();
+    } else {
+      navigate('/');
+    }
+  }, [token, role, navigate]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -63,28 +137,54 @@ function AdminDashboard() {
   // Filter users
   useEffect(() => {
     let filtered = users;
+    
     if (searchTerm) {
       filtered = filtered.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+    
     if (filterRole !== 'all') {
       filtered = filtered.filter(user => user.role === filterRole);
     }
+    
     if (filterStatus !== 'all') {
       filtered = filtered.filter(user => user.status === filterStatus);
     }
+    
     setFilteredUsers(filtered);
   }, [users, searchTerm, filterRole, filterStatus]);
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+
+    try {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+
+      if (user.type === 'consultant') {
+        await axios.delete(`http://localhost:8000/api/consultant_profiles/${user.originalId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else if (user.type === 'recruiter') {
+        await axios.delete(`http://localhost:8000/api/delete-recruiter/${user.originalId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
+      // Remove from local state
       setUsers(prev => prev.filter(user => user.id !== id));
+      alert('User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert(error.response?.data?.detail || 'Failed to delete user');
     }
   };
 
-  const handleStatusToggle = (id) => {
+  const handleStatusToggle = async (id) => {
+    // Note: You'll need to add status update endpoints to your backend
+    // For now, this just toggles locally
     setUsers(prev =>
       prev.map(user =>
         user.id === id
@@ -92,35 +192,81 @@ function AdminDashboard() {
           : user
       )
     );
+    
+    // TODO: Make API call to update status in backend
+    // const user = users.find(u => u.id === id);
+    // await axios.put(`http://localhost:8000/api/update-user-status/${user.originalId}`, {
+    //   status: user.status === 'active' ? 'inactive' : 'active'
+    // });
   };
 
+  // Calculate stats
   const totalUsers = users.length;
   const activeUsers = users.filter(u => u.status === 'active').length;
   const recruiters = users.filter(u => u.role === 'recruiter').length;
   const jobSeekers = users.filter(u => u.role === 'user').length;
 
-  return (
+  if (loading) {
+    return (
       <div className="dashboard">
         <Header Name={userName} onProfileClick={() => {}} onLogout={handleLogout} />
-    <div className="container">
-        <AdminHeader Name={userName} />
-        <div className="stats-row">
-          
-            <StatsCard icon="👥" value={totalUsers} label="Total Users" colorClass="color-blue" />
-          
-          
-            <StatsCard icon="✅" value={activeUsers} label="Active Users" colorClass="color-green" />
-          
-          
-            <StatsCard icon="🏢" value={recruiters} label="Recruiters" colorClass="color-blue-dark" />
-          
-          
-            <StatsCard icon="🎯" value={jobSeekers} label="Job Seekers" colorClass="color-yellow" />
-
-            <StatsCard icon="📊" value={2} label="Mail Sent" colorClass="color-purple" />
-
-            <StatsCard icon="🔍" value={6} label="Jobs Posted" colorClass="color-gray" />
+        <div className="container">
+          <div className="text-center mt-5">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3">Loading admin dashboard...</p>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard">
+      <Header Name={userName} onProfileClick={() => {}} onLogout={handleLogout} />
+      <div className="container">
+        <AdminHeader Name={userName} />
+        
+        <div className="stats-row">
+          <StatsCard 
+            icon="👥" 
+            value={totalUsers} 
+            label="Total Users" 
+            colorClass="color-blue" 
+          />
+          <StatsCard 
+            icon="✅" 
+            value={activeUsers} 
+            label="Active Users" 
+            colorClass="color-green" 
+          />
+          <StatsCard 
+            icon="🏢" 
+            value={recruiters} 
+            label="Recruiters" 
+            colorClass="color-blue-dark" 
+          />
+          <StatsCard 
+            icon="🎯" 
+            value={jobSeekers} 
+            label="Job Seekers" 
+            colorClass="color-yellow" 
+          />
+          <StatsCard 
+            icon="📊" 
+            value={stats.emailsSent} 
+            label="Emails Sent" 
+            colorClass="color-purple" 
+          />
+          <StatsCard 
+            icon="🔍" 
+            value={stats.totalJobs} 
+            label="Jobs Posted" 
+            colorClass="color-gray" 
+          />
+        </div>
+
         <Filters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -129,6 +275,7 @@ function AdminDashboard() {
           filterStatus={filterStatus}
           setFilterStatus={setFilterStatus}
         />
+
         <UsersTable
           filteredUsers={filteredUsers}
           handleStatusToggle={handleStatusToggle}

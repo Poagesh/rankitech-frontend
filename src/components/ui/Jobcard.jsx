@@ -1,5 +1,6 @@
 import { styles, getScoreColor } from '../../styles/styles';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function JobCard({ job }) {
   const [progressStep, setProgressStep] = useState(0);
@@ -26,6 +27,18 @@ function JobCard({ job }) {
     { label: 'Profiles Ranked', position: 50 },
     { label: 'Email Sent', position: 100 },
   ];
+
+  const handleApply = async () => {
+    try {
+      await axios.post('http://localhost:8000/api/apply', {
+        job_id: job.id,
+        consultant_id: localStorage.getItem('user_id'),
+      });
+      alert("Application submitted successfully!");
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to apply for job.");
+    }
+  };
 
   return (
     <div
@@ -54,14 +67,12 @@ function JobCard({ job }) {
 
       {/* Inline Milestone Progress Bar */}
       <div className="mb-3" style={{ position: 'relative', padding: '15px 0' }}>
-        {/* Progress Bar Track */}
         <div style={{
           position: 'relative',
           height: '12px',
           background: '#e0e0e0',
           borderRadius: '6px',
         }}>
-          {/* Filled portion */}
           <div style={{
             position: 'absolute',
             height: '100%',
@@ -71,9 +82,9 @@ function JobCard({ job }) {
             transition: 'width 0.5s ease',
           }}></div>
 
-          {/* Milestone dots */}
           {milestones.map((m, index) => (
-            <div key={index}
+            <div
+              key={index}
               style={{
                 position: 'absolute',
                 left: `calc(${m.position}% - 6px)`,
@@ -82,7 +93,7 @@ function JobCard({ job }) {
                 width: '12px',
                 height: '12px',
                 borderRadius: '50%',
-                background:'#1e88e5',
+                background: '#1e88e5',
                 border: `2px solid ${progressStep >= index + 1 ? '#ffffff' : '#ccc'}`,
                 transition: 'all 0.3s ease',
                 zIndex: 2,
@@ -91,7 +102,6 @@ function JobCard({ job }) {
           ))}
         </div>
 
-        {/* Labels under milestones */}
         <div className="d-flex justify-content-between mt-2" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
           {milestones.map((m, index) => (
             <span key={index} style={{ color: progressStep >= index + 1 ? '#1e88e5' : '#aaa' }}>
@@ -103,7 +113,7 @@ function JobCard({ job }) {
 
       {/* Action Buttons */}
       <div className="d-flex gap-2 mt-3">
-        <button className="btn btn-success btn-sm">✉️ Apply Now</button>
+        <button className="btn btn-success btn-sm" onClick={handleApply}>✉️ Apply Now</button>
         <button className="btn btn-outline-primary btn-sm">👁️ View Details</button>
         <button className="btn btn-outline-secondary btn-sm">💾 Save Job</button>
       </div>
