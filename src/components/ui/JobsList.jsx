@@ -81,58 +81,31 @@ const JobsList = ({ jobs, onBack, onJobClick }) => {
 
   return (
     <div style={styles.container}>
-      <button 
-        style={styles.backButton}
-        onClick={onBack}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-        }}
-      >
-        <ArrowLeft size={18} />
-        Back to Dashboard
+      <button style={styles.backButton} onClick={onBack}>
+        <ArrowLeft size={18} /> Back to Dashboard
       </button>
 
       <h2 style={styles.title}>Posted Jobs ({jobs.length})</h2>
 
       {jobs.length === 0 ? (
         <div style={styles.emptyState}>
-          <Briefcase size={48} style={{color: '#ccc', marginBottom: '20px'}} />
+          <Briefcase size={48} style={{ color: '#ccc', marginBottom: '20px' }} />
           <p>No jobs posted yet. Start by posting your first job!</p>
         </div>
       ) : (
         <div style={styles.jobsGrid}>
           {jobs.map((job) => (
-            <div
-              key={job.id}
-              style={styles.jobCard}
-              onClick={() => onJobClick(job)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-              }}
-            >
+            <div key={job.id} style={styles.jobCard} onClick={() => onJobClick(job)}>
               <div style={styles.jobTitle}>
-                <Briefcase size={20} style={{color: '#2196f3'}} />
+                <Briefcase size={20} style={{ color: '#2196f3' }} />
                 {job.title}
               </div>
-              
-              <p style={{color: '#666', fontSize: '14px', lineHeight: '1.5'}}>
-                {job.description.substring(0, 100)}...
+              <p style={{ color: '#666', fontSize: '14px' }}>
+                {(job.description || '').substring(0, 100)}...
               </p>
-              
               <div style={styles.jobMeta}>
-                <span style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
-                  <Users size={14} />
-                  Skills: {job.skills}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Users size={14} /> Skills: {Array.isArray(job.skills) ? job.skills.join(', ') : job.skills}
                 </span>
                 <span style={styles.applicationCount}>
                   {job.applications} applications

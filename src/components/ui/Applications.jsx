@@ -113,20 +113,8 @@ const Applications = ({ job, applications, onBack }) => {
 
   return (
     <div style={styles.container}>
-      <button 
-        style={styles.backButton}
-        onClick={onBack}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-        }}
-      >
-        <ArrowLeft size={18} />
-        Back to Job Details
+      <button style={styles.backButton} onClick={onBack}>
+        <ArrowLeft size={18} /> Back to Job Details
       </button>
 
       <h2 style={styles.title}>Applications for {job.title}</h2>
@@ -134,53 +122,36 @@ const Applications = ({ job, applications, onBack }) => {
 
       {applications.length === 0 ? (
         <div style={styles.emptyState}>
-          <User size={48} style={{color: '#ccc', marginBottom: '20px'}} />
+          <User size={48} style={{ color: '#ccc', marginBottom: '20px' }} />
           <p>No applications received yet.</p>
         </div>
       ) : (
         <div style={styles.applicationsGrid}>
           {applications.map((application) => (
-            <div
-              key={application.id}
-              style={styles.applicationCard}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-              }}
-            >
+            <div key={application.id} style={styles.applicationCard}>
               <div style={styles.applicantHeader}>
-                <div style={styles.avatar}>
-                  {application.name.charAt(0)}
-                </div>
+                <div style={styles.avatar}>{application.name.charAt(0)}</div>
                 <div>
                   <div style={styles.applicantName}>{application.name}</div>
-                  <div style={styles.applicantTitle}>{application.title}</div>
+                  <div style={styles.applicantTitle}>{application.title || 'Consultant'}</div>
                 </div>
               </div>
 
               <div style={styles.infoGrid}>
                 <div style={styles.infoItem}>
-                  <Mail size={14} />
-                  {application.email}
+                  <Mail size={14} /> {application.email}
                 </div>
                 <div style={styles.infoItem}>
-                  <Phone size={14} />
-                  {application.phone}
+                  <Phone size={14} /> {application.phone}
                 </div>
                 <div style={styles.infoItem}>
-                  <Calendar size={14} />
-                  Applied on {application.appliedDate}
+                  <Calendar size={14} /> Applied on {application.appliedDate}
                 </div>
               </div>
 
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={styles.matchScore}>
-                  <Star size={12} />
-                  {application.matchScore}% Match
+                  <Star size={12} /> {application.matchScore || 0}% Match
                 </span>
               </div>
             </div>

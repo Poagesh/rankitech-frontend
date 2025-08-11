@@ -148,20 +148,8 @@ const TopMatches = ({ job, topMatches, onBack }) => {
 
   return (
     <div style={styles.container}>
-      <button 
-        style={styles.backButton}
-        onClick={onBack}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'translateY(0)';
-          e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-        }}
-      >
-        <ArrowLeft size={18} />
-        Back to Job Details
+      <button style={styles.backButton} onClick={onBack}>
+        <ArrowLeft size={18} /> Back to Job Details
       </button>
 
       <h2 style={styles.title}>Top Matches for {job.title}</h2>
@@ -169,41 +157,26 @@ const TopMatches = ({ job, topMatches, onBack }) => {
 
       {topMatches.length === 0 ? (
         <div style={styles.emptyState}>
-          <Star size={48} style={{color: '#ccc', marginBottom: '20px'}} />
+          <Star size={48} style={{ color: '#ccc', marginBottom: '20px' }} />
           <p>No top matches found yet.</p>
         </div>
       ) : (
         <div style={styles.matchesGrid}>
           {topMatches.map((match, index) => (
-            <div
-              key={match.id}
-              style={styles.matchCard}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-              }}
-            >
+            <div key={match.id} style={styles.matchCard}>
               {index === 0 && (
                 <div style={styles.topMatchBadge}>
-                  <Award size={12} />
-                  TOP MATCH
+                  <Award size={12} /> TOP MATCH
                 </div>
               )}
 
               <div style={styles.candidateHeader}>
-                <div style={styles.avatar}>
-                  {match.name.charAt(0)}
-                </div>
-                <div style={{flex: 1}}>
+                <div style={styles.avatar}>{match.name.charAt(0)}</div>
+                <div style={{ flex: 1 }}>
                   <div style={styles.candidateName}>{match.name}</div>
-                  <div style={styles.candidateTitle}>{match.title}</div>
+                  <div style={styles.candidateTitle}>{match.title || 'Consultant'}</div>
                   <div style={styles.matchScore}>
-                    <TrendingUp size={24} />
-                    {match.matchScore}%
+                    <TrendingUp size={24} /> {match.matchScore}%
                   </div>
                 </div>
               </div>
@@ -211,18 +184,15 @@ const TopMatches = ({ job, topMatches, onBack }) => {
               <div style={styles.skillsSection}>
                 <div style={styles.skillsTitle}>Matching Skills</div>
                 <div style={styles.skillTags}>
-                  {match.skills.map((skill, skillIndex) => (
-                    <span key={skillIndex} style={styles.skillTag}>
-                      {skill}
-                    </span>
+                  {(match.skills || []).map((skill, sIndex) => (
+                    <span key={sIndex} style={styles.skillTag}>{skill}</span>
                   ))}
                 </div>
               </div>
 
               <div style={styles.experienceSection}>
                 <div style={styles.experienceText}>
-                  <User size={14} />
-                  {match.experience} years of experience
+                  <User size={14} /> {match.experience || 'N/A'} years of experience
                 </div>
               </div>
             </div>
