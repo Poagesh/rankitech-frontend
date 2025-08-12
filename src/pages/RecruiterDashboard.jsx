@@ -212,58 +212,20 @@ const RecruiterDashboard = () => {
 
   const handleUpdateJob = async (jobId, updatedData) => {
   try {
-    const updatePayload = {};
-    
-    // Map all fields from JobUpdate schema
-    if (updatedData.title?.trim()) {
-      updatePayload.job_title = updatedData.title.trim();
-    }
-    if (updatedData.description?.trim()) {
-      updatePayload.job_description = updatedData.description.trim();
-    }
-    if (updatedData.skills?.trim()) {
-      updatePayload.required_skills = updatedData.skills
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-    }
-    if (updatedData.preferred_skills?.trim()) {
-      updatePayload.preferred_skills = updatedData.preferred_skills
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-    }
-    if (updatedData.location?.trim()) {
-      updatePayload.location = updatedData.location.trim();
-    }
-    if (updatedData.experience_level?.trim()) {
-      updatePayload.experience_level = updatedData.experience_level.trim();
-    }
-    if (updatedData.salary_range?.trim()) {
-      updatePayload.salary_range = updatedData.salary_range.trim();
-    }
-    if (updatedData.employment_type?.trim()) {
-      updatePayload.employment_type = updatedData.employment_type.trim();
-    }
-    if (updatedData.deadline_to_apply?.trim()) {
-      // Convert date to ISO datetime format for backend
-      updatePayload.deadline_to_apply = new Date(updatedData.deadline_to_apply + 'T23:59:59.999Z').toISOString();
-    }
+    console.log('📥 Received update data from JobDetails:', updatedData);
 
-    console.log('📤 Sending update payload:', JSON.stringify(updatePayload, null, 2));
-
-    const response = await axios.put(`http://localhost:8000/api/jobs/${jobId}`, updatePayload, {
+    const response = await axios.put(`http://localhost:8000/api/jobs/${jobId}`, updatedData, {
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
     });
 
-    console.log('✅ Update response:', response.data);
+    console.log('✅ Backend response:', response.data);
 
-    // Update local state with response data
+    // Create updated job object for local state
     const updatedJob = {
-      ...selectedJob,
+      id: response.data.id,
       title: response.data.job_title,
       description: response.data.job_description,
       skills: Array.isArray(response.data.required_skills) 
@@ -274,19 +236,28 @@ const RecruiterDashboard = () => {
       salary_range: response.data.salary_range,
       employment_type: response.data.employment_type,
       deadline_to_apply: response.data.deadline_to_apply,
+      applications: selectedJob?.applications || 0, // Keep existing count
+      topMatches: selectedJob?.topMatches || 0, // Keep existing count
+      postedDate: selectedJob?.postedDate || new Date().toISOString().split('T')[0],
+      recruiter_id: response.data.recruiter_id,
       required_skills: response.data.required_skills || [],
-      preferred_skills: response.data.preferred_skills || []
+      preferred_skills: response.data.preferred_skills || [],
+      max_candidates: response.data.max_candidates || 5,
+      status: response.data.status || 'active'
     };
 
+    // Update jobs list
     setJobs(jobs.map(job => job.id === jobId ? updatedJob : job));
+    
+    // Update selected job
     setSelectedJob(updatedJob);
-    alert('Job updated successfully!');
+
+    alert('✅ Job updated successfully!');
 
   } catch (error) {
     console.error('❌ Update failed:', error);
     console.error('❌ Response status:', error.response?.status);
     console.error('❌ Response data:', error.response?.data);
-    console.error('❌ Validation errors:', error.response?.data?.detail);
     
     let errorMessage = 'Failed to update job. ';
     if (error.response?.data?.detail) {
@@ -297,7 +268,7 @@ const RecruiterDashboard = () => {
       }
     }
     
-    alert(errorMessage);
+    alert('❌ ' + errorMessage);
   }
 };
 
@@ -320,59 +291,172 @@ const RecruiterDashboard = () => {
   };
 
   const handleViewApplications = async (job) => {
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:8000/api/job_applications', {
+  try {
+    setLoading(true);
+    
+    console.log(`📋 Fetching applications for job: ${job.title} (ID: ${job.id})`);
+    
+    // Fetch applications and match results in parallel
+    const [applicationsRes, matchResultsRes] = await Promise.allSettled([
+      axios.get('http://localhost:8000/api/job_applications', {
         headers: { Authorization: `Bearer ${token}` },
-      });
+      }),
+      axios.get('http://localhost:8000/api/ranked_applicant_matches', {
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => ({ data: [] })) // Don't fail if matches don't exist
+    ]);
 
-      // Filter applications for this specific job and get consultant details
-      const jobApplications = response.data.filter(app => app.job_id === job.id);
-      
-      // Fetch consultant details for each application
-      const applicationsWithDetails = await Promise.all(
-        jobApplications.map(async (app) => {
-          try {
-            const consultantRes = await axios.get(`http://localhost:8000/api/consultant_profiles/${app.consultant_id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            
-            return {
-              id: app.id,
-              name: consultantRes.data.name,
-              title: 'Consultant', // You might want to add a title field to consultant profile
-              email: consultantRes.data.primary_email,
-              phone: consultantRes.data.mobile_no || 'N/A',
-              appliedDate: app.applied_at ? app.applied_at.split('T')[0] : 'N/A',
-              matchScore: 0, // Will be updated when we get match results
-              consultant_id: app.consultant_id
-            };
-          } catch (error) {
-            console.error(`Error fetching consultant ${app.consultant_id}:`, error);
-            return {
-              id: app.id,
-              name: 'Unknown',
-              title: 'Consultant',
-              email: 'N/A',
-              phone: 'N/A',
-              appliedDate: app.applied_at ? app.applied_at.split('T')[0] : 'N/A',
-              matchScore: 0,
-              consultant_id: app.consultant_id
-            };
-          }
-        })
-      );
+    // Handle applications response
+    if (applicationsRes.status === 'rejected') {
+      throw new Error('Failed to fetch applications');
+    }
 
-      setApplications(applicationsWithDetails);
+    // Filter applications for this specific job
+    const jobApplications = applicationsRes.value.data.filter(app => app.job_id === job.id);
+    
+    if (jobApplications.length === 0) {
+      setApplications([]);
       setSelectedJob(job);
       setCurrentView('applications');
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      alert('Failed to load applications. Please try again.');
-    } finally {
-      setLoading(false);
+      alert('ℹ️ No applications found for this job yet.');
+      return;
     }
-  };
+
+    console.log(`📊 Found ${jobApplications.length} applications`);
+
+    // Create match scores lookup
+    const matchScores = {};
+    if (matchResultsRes.status === 'fulfilled' && matchResultsRes.value.data) {
+      matchResultsRes.value.data
+        .filter(match => match.job_id === job.id)
+        .forEach(match => {
+          matchScores[match.consultant_id] = {
+            score: Math.round(match.match_score || 0),
+            topSkills: match.top_skills_matched || [],
+            missingSkills: match.missing_skills || [],
+            report: match.report || ''
+          };
+        });
+    }
+
+    // Fetch consultant details with better error handling
+    const applicationsWithDetails = await Promise.allSettled(
+      jobApplications.map(async (app) => {
+        try {
+          const consultantRes = await axios.get(
+            `http://localhost:8000/api/consultant_profiles/${app.consultant_id}`, 
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              timeout: 10000 // 10 second timeout
+            }
+          );
+          
+          const consultant = consultantRes.data;
+          const matchData = matchScores[app.consultant_id] || {};
+          
+          return {
+            id: app.id,
+            name: consultant.name || 'Unknown',
+            title: consultant.position || 'Consultant',
+            email: consultant.primary_email || 'N/A',
+            phone: consultant.mobile_no || 'N/A',
+            location: consultant.location || 'N/A',
+            experience: consultant.experience_years ? `${consultant.experience_years} years` : 'N/A',
+            appliedDate: app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A',
+            appliedTime: app.applied_at ? new Date(app.applied_at).toLocaleTimeString() : 'N/A',
+            matchScore: matchData.score || 0,
+            topSkills: matchData.topSkills || [],
+            missingSkills: matchData.missingSkills || [],
+            report: matchData.report || '',
+            consultant_id: app.consultant_id,
+            application_id: app.id,
+            status: 'Applied' // You might want to add status to your backend
+          };
+        } catch (error) {
+          console.error(`❌ Error fetching consultant ${app.consultant_id}:`, error.message);
+          
+          // Return partial data for failed requests
+          const matchData = matchScores[app.consultant_id] || {};
+          return {
+            id: app.id,
+            name: 'Unknown Applicant',
+            title: 'Consultant',
+            email: 'N/A',
+            phone: 'N/A',
+            location: 'N/A',
+            experience: 'N/A',
+            appliedDate: app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A',
+            appliedTime: 'N/A',
+            matchScore: matchData.score || 0,
+            topSkills: matchData.topSkills || [],
+            missingSkills: matchData.missingSkills || [],
+            report: matchData.report || '',
+            consultant_id: app.consultant_id,
+            application_id: app.id,
+            status: 'Applied',
+            error: 'Failed to load profile details'
+          };
+        }
+      })
+    );
+
+    // Process results and handle any failures
+    const validApplications = applicationsWithDetails
+      .filter(result => result.status === 'fulfilled')
+      .map(result => result.value)
+      .sort((a, b) => {
+        // Sort by match score (highest first), then by application date (newest first)
+        if (a.matchScore !== b.matchScore) {
+          return b.matchScore - a.matchScore;
+        }
+        return new Date(b.appliedDate) - new Date(a.appliedDate);
+      });
+
+    const failedCount = applicationsWithDetails.filter(result => result.status === 'rejected').length;
+    
+    if (failedCount > 0) {
+      console.warn(`⚠️ Failed to load ${failedCount} applicant profiles`);
+    }
+
+    console.log(`✅ Successfully loaded ${validApplications.length} applications with details`);
+
+    setApplications(validApplications);
+    setSelectedJob({
+      ...job,
+      applicationsCount: validApplications.length,
+      averageMatchScore: validApplications.length > 0 
+        ? Math.round(validApplications.reduce((sum, app) => sum + app.matchScore, 0) / validApplications.length)
+        : 0
+    });
+    setCurrentView('applications');
+
+    // Show success notification
+    if (validApplications.length > 0) {
+      alert(`✅ Loaded ${validApplications.length} applications successfully!`);
+    }
+
+  } catch (error) {
+    console.error('❌ Error in handleViewApplications:', error);
+    
+    let errorMessage = 'Failed to load applications. ';
+    if (error.response?.status === 401) {
+      errorMessage += 'Please log in again.';
+      // Optionally redirect to login
+      // navigate('/');
+    } else if (error.response?.status === 403) {
+      errorMessage += 'You do not have permission to view these applications.';
+    } else if (error.code === 'NETWORK_ERROR') {
+      errorMessage += 'Please check your internet connection.';
+    } else {
+      errorMessage += error.response?.data?.detail || error.message || 'Please try again.';
+    }
+    
+    alert('❌ ' + errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleViewTopMatches = async (job) => {
     try {

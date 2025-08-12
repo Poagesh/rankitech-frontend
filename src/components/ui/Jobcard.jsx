@@ -1,120 +1,83 @@
-import { styles, getScoreColor } from '../../styles/styles';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { styles, getScoreColor } from '../../styles/styles';
 
-function JobCard({ job }) {
-  const [progressStep, setProgressStep] = useState(0);
-
+/**
+ * props
+ * ──────────────────────────────────────────────────────────────
+ * job            object  – full job
+ * onApply        ()      – parent handler
+ * isApplied      bool    – already applied?
+ * onViewDetails  ()      – show details view
+ */
+function JobCard({ job, onApply, isApplied = false, onViewDetails }) {
+  /* fake progress-bar animation */
+  const [step, setStep] = useState(0);
   useEffect(() => {
-    let step = 0;
-    const interval = setInterval(() => {
-      step += 1;
-      if (step > 3) {
-        clearInterval(interval);
-      } else {
-        setProgressStep(step);
-      }
-    }, 1500);
-    return () => clearInterval(interval);
+    let s = 0;
+    const iv = setInterval(() => { s += 1; if (s > 3) clearInterval(iv); else setStep(s); }, 1500);
+    return () => clearInterval(iv);
   }, []);
-
-  const getProgressPercent = () => {
-    return (progressStep / 3) * 100;
-  };
-
-  const milestones = [
-    { label: 'JD Compared', position: 0 },
-    { label: 'Profiles Ranked', position: 50 },
-    { label: 'Email Sent', position: 100 },
+  const percent = (step / 3) * 100;
+  const marks = [
+    { label: 'JD Compared',     pos: 0   },
+    { label: 'Profiles Ranked', pos: 50  },
+    { label: 'Email Sent',      pos: 100 }
   ];
 
-  const handleApply = async () => {
-    try {
-      await axios.post('http://localhost:8000/api/apply', {
-        job_id: job.id,
-        consultant_id: localStorage.getItem('user_id'),
-      });
-      alert("Application submitted successfully!");
-    } catch (error) {
-      alert(error.response?.data?.detail || "Failed to apply for job.");
-    }
-  };
-
+  /* UI */
   return (
-    <div
-      style={styles.jobCard}
-      onMouseEnter={(e) => Object.assign(e.target.style, { ...styles.jobCard, ...styles.jobCardHover })}
-      onMouseLeave={(e) => Object.assign(e.target.style, styles.jobCard)}
-    >
-      {/* Header */}
+    <div style={styles.jobCard}>
+      {/* header */}
       <div className="d-flex justify-content-between align-items-start mb-3">
         <div>
           <h5 className="text-dark mb-2 fw-bold">
-            <span style={{ marginRight: '10px' }}>💼</span>
-            {job.jobTitle}
+            <span style={{ marginRight: 10 }}>💼</span>{job.jobTitle}
           </h5>
           <div style={styles.companyBadge}>🏢 {job.company}</div>
         </div>
-        <div
-          style={{
-            ...styles.matchScore,
-            background: `linear-gradient(135deg, ${getScoreColor(job.matchScore)}, ${getScoreColor(job.matchScore)}dd)`,
-          }}
-        >
+        <div style={{
+          ...styles.matchScore,
+          background: `linear-gradient(135deg, ${getScoreColor(job.matchScore)}, ${getScoreColor(job.matchScore)}dd)`
+        }}>
           ⭐ {job.matchScore}% Match
         </div>
       </div>
 
-      {/* Inline Milestone Progress Bar */}
-      <div className="mb-3" style={{ position: 'relative', padding: '15px 0' }}>
-        <div style={{
-          position: 'relative',
-          height: '12px',
-          background: '#e0e0e0',
-          borderRadius: '6px',
-        }}>
+      {/* progress bar */}
+      <div className="mb-3" style={{ position:'relative', padding:'15px 0' }}>
+        <div style={{ position:'relative', height:12, background:'#e0e0e0', borderRadius:6 }}>
           <div style={{
-            position: 'absolute',
-            height: '100%',
-            background: '#1e88e5',
-            borderRadius: '6px',
-            width: `${getProgressPercent()}%`,
-            transition: 'width 0.5s ease',
-          }}></div>
-
-          {milestones.map((m, index) => (
-            <div
-              key={index}
-              style={{
-                position: 'absolute',
-                left: `calc(${m.position}% - 6px)`,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: '#1e88e5',
-                border: `2px solid ${progressStep >= index + 1 ? '#ffffff' : '#ccc'}`,
-                transition: 'all 0.3s ease',
-                zIndex: 2,
-              }}
-            ></div>
+            position:'absolute', height:'100%', borderRadius:6,
+            background:'#1e88e5', width:`${percent}%`, transition:'width .5s ease'
+          }}/>
+          {marks.map((m,i)=>(
+            <div key={i} style={{
+              position:'absolute', left:`calc(${m.pos}% - 6px)`, top:'50%',
+              width:12, height:12, borderRadius:'50%', transform:'translateY(-50%)',
+              background:'#1e88e5',
+              border:`2px solid ${step>=i+1?'#fff':'#ccc'}`, transition:'all .3s ease'
+            }}/>
           ))}
         </div>
-
-        <div className="d-flex justify-content-between mt-2" style={{ fontSize: '0.85rem', fontWeight: '500' }}>
-          {milestones.map((m, index) => (
-            <span key={index} style={{ color: progressStep >= index + 1 ? '#1e88e5' : '#aaa' }}>
-              {m.label}
-            </span>
+        <div className="d-flex justify-content-between mt-2" style={{ fontSize:'.85rem', fontWeight:500 }}>
+          {marks.map((m,i)=>(
+            <span key={i} style={{ color: step>=i+1 ? '#1e88e5' : '#aaa' }}>{m.label}</span>
           ))}
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* buttons */}
       <div className="d-flex gap-2 mt-3">
-        <button className="btn btn-success btn-sm" onClick={handleApply}>✉️ Apply Now</button>
-        <button className="btn btn-outline-primary btn-sm">👁️ View Details</button>
+        <button
+          className={`btn btn-sm ${isApplied ? 'btn-success' : 'btn-primary'}`}
+          disabled={isApplied}
+          onClick={() => !isApplied && onApply?.()}
+        >
+          {isApplied ? '✅ Applied' : '✉️ Apply Now'}
+        </button>
+        <button className="btn btn-outline-primary btn-sm" onClick={() => onViewDetails?.()}>
+          👁️ View Details
+        </button>
         <button className="btn btn-outline-secondary btn-sm">💾 Save Job</button>
       </div>
     </div>

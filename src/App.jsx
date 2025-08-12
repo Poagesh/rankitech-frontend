@@ -9,6 +9,7 @@ import OtpVerification from './pages/Otpverification';
 import RecruiterSignupForm from './pages/Recruiterregistration';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import About from './components/ui/About';
 
 // Helper to check if user is authenticated
 const isAuthenticated = () => {
@@ -58,6 +59,7 @@ function App() {
       </Routes>
 
       <ToastContainer position="top-center" autoClose={3000} />
+      <About />
     </>
   );
 }

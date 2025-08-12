@@ -138,6 +138,9 @@ function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card} className="p-4 p-md-5">
+        <h1 className="text-center fw-bold mb-4" style={{ color: '#1e88e5' }}>
+      RANKITECH
+    </h1>
         <div className="text-center mb-4">
           <div style={styles.avatar}>👤</div>
           <h2 className="h3 fw-bold text-dark mb-2">Welcome Back!</h2>
