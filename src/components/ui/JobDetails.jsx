@@ -370,26 +370,7 @@ const JobDetails = ({ job, onBack, onUpdateJob, onViewApplications, onViewTopMat
           )}
         </div>
 
-        {/* Preferred Skills */}
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Preferred Skills</h3>
-          {isEditing ? (
-            <input 
-              style={styles.input} 
-              type="text" 
-              value={editData.preferred_skills} 
-              onChange={(e) => setEditData({ ...editData, preferred_skills: e.target.value })}
-              placeholder="e.g., TypeScript, AWS, Docker (comma separated)"
-            />
-          ) : (
-            <p style={styles.text}>
-              {Array.isArray(job.preferred_skills) 
-                ? job.preferred_skills.join(', ') 
-                : (job.preferred_skills || 'None specified')
-              }
-            </p>
-          )}
-        </div>
+        
 
         {/* Two Column Layout for Location / Employment Type */}
         <div style={styles.twoColumnGrid}>

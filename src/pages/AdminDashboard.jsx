@@ -228,7 +228,7 @@ function AdminDashboard() {
       <div className="container">
         <AdminHeader Name={userName} />
         
-        <div className="stats-row">
+        <div className="row mb-2 flex">
           <StatsCard 
             icon="👥" 
             value={totalUsers} 
